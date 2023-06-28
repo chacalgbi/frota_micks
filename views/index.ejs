@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Controle de Revisões da Frota MICKS</title>
+  <script src="./assets/dist/js/jquery-3.6.0.js"></script>
+  <script src="./assets/dist/js/notify.js"></script>
+  <script src="./assets/dist/js/sweetalert2.all.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="./assets/index.css" rel="stylesheet">
+  <style>
+  </style>
+</head>
+
+</body>
+<div class="container py-3">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card shadow-2-strong" style="border-radius: 1rem; background-color: #508bfc;">
+          <div class="card-body p-5 text-center">
+            <h4 class="mb-5">Controle de Revisões da Frota MICKS</h4>
+
+            <div class="form-outline mb-4">
+              <label class="form-label">Usuário</label>
+              <input type="text" id="user" value="" class="form-control form-control-lg" />
+            </div>
+            
+            <div class="form-outline mb-4">
+              <label class="form-label">Senha</label>
+              <input type="password" id="pass" value="" class="form-control form-control-lg" />
+            </div>
+            
+            <button class="btn btn-primary btn-lg btn-block" type="button" onclick="login()">Entrar</button>
+
+            <span id="servidor" style="display: none;"><%= servidor %></span>
+            <span id="mensagem" style="display: none;"><%= msg %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const mensagem = document.getElementById("mensagem").innerText
+  const endpoint = document.getElementById("servidor").innerText
+  const token = localStorage.getItem('tokenMicksFrota')
+
+  msg(mensagem)
+
+  function msg(msg, tipo="info"){
+    if(tipo === 'nao'){
+      $.notify(msg, "success")
+    }else if(tipo === 'sim'){
+      $.notify(msg, "error")
+    }else{
+      $.notify(msg, "info")
+    }
+  }
+
+  function login() {
+    const user = document.getElementById('user').value
+    const pass = document.getElementById('pass').value
+    
+    if (user == '' || pass == '') {
+      msg("Usuário ou Senha inválidos", "sim")
+    } else {
+      axios.post(`${endpoint}login`, { user: user, pass: pass }).then((res)=>{
+        msg(`${res.data.msg} - ${res.statusText}`, res.data.erroGeral)
+        localStorage.setItem("tokenMicksFrota", res.data.token)
+        setTimeout(function () { location.replace(`${endpoint}main`); }, 2000)
+      })
+      .catch((err)=>{
+        if(err){
+          console.error(err.response.data)
+          msg(`${err.response.data.msg} - ${err.response.statusText}`, err.response.data.erroGeral)
+          localStorage.clear()
+          document.getElementById('pass').value = ""
+        }
+      })
+    }
+  }
+
+  (function(){
+    if(token != null && token.length > 20){
+      msg("Token encontrado! Redirecionando...", "nao")
+      setTimeout(function () { location.replace(`${endpoint}main`); }, 2000)
+    }
+  })()
+
+</script>
+</body>
+
+</html>
