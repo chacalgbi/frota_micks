@@ -1,0 +1,18 @@
+version: "3"
+
+services:
+    controle_revisoes_frota:
+        build: .
+        image: micks/controle_revisoes_frota:1.0
+        container_name: controle_revisoes_frota
+        network_mode: bridge
+        env_file:
+            - ./.env
+        ports:
+            - '8113:8113'
+        tty: true
+        restart: always
+        volumes:
+            - /home/certificadoSSL:/etc/certificadoSSL
+        environment:        
+            - TZ=America/Fortaleza

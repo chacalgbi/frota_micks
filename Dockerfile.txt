@@ -1,0 +1,23 @@
+#informando a imagem a ser usada
+FROM node:18.16.0-alpine
+
+#Autor
+LABEL maintainer="Thome Lucas"
+
+#Atualizando o container
+RUN apk update; apk update
+
+CMD mkdir /controle_revisoes_frota
+
+COPY . /controle_revisoes_frota 
+
+CMD npm config set fund false --global
+CMD npm config set fund false
+
+WORKDIR /controle_revisoes_frota
+
+RUN npm install
+
+EXPOSE 8113
+
+ENTRYPOINT [ "node","revisoes.js" ]
